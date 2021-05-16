@@ -7,18 +7,25 @@
   "dependencies": {
     "@material-ui/core": "4.10.0",
     "@material-ui/icons": "4.9.1",
+    "antd": "^4.15.2",
+    "axios": "^0.21.1",
     "chartist": "0.10.1",
     "classnames": "2.2.6",
+    "fs": "0.0.1-security",
     "history": "4.10.1",
+    "lodash": "^4.17.21",
     "perfect-scrollbar": "1.5.0",
     "prop-types": "15.7.2",
     "react": "16.13.1",
     "react-chartist": "0.14.3",
     "react-dom": "16.13.1",
     "react-google-maps": "9.4.5",
+    "react-player": "^2.9.0",
     "react-router-dom": "5.2.0",
     "react-scripts": "3.4.1",
-    "react-swipeable-views": "0.13.9"
+    "react-swipeable-views": "0.13.9",
+    "swal": "^0.1.0",
+    "sweetalert2": "^10.16.6"
   },
   "scripts": {
     "start": "react-scripts start",

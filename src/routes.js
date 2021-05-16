@@ -28,7 +28,11 @@ import Language from "@material-ui/icons/Language";
 import DashboardPage from "views/Dashboard/Dashboard.js";
 import UserProfile from "views/UserProfile/UserProfile.js";
 import TableList from "views/TableList/TableList.js";
-import Typography from "views/Typography/Typography.js";
+import SeasonManage from "views/SeasonManage/SeasonManage.js";
+import LessonManage from "views/LessonManage/LessonManage.js";
+import UserManage from "views/UserManage/UserManage.js";
+import TestExamManage from "views/TestExamManage/TestExamManage.js";
+import Model3DManage from "views/Model3DManage/Model3DManage.js";
 import Icons from "views/Icons/Icons.js";
 import Maps from "views/Maps/Maps.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
@@ -43,47 +47,47 @@ const dashboardRoutes = [
     rtlName: "لوحة القيادة",
     icon: Dashboard,
     component: DashboardPage,
-    layout: "/admin"
+    layout: "/admin",
   },
   {
-    path: "/user",
-    name: "User Profile",
+    path: "/userManage",
+    name: "User Manage",
     rtlName: "ملف تعريفي للمستخدم",
     icon: Person,
-    component: UserProfile,
-    layout: "/admin"
+    component: UserManage,
+    layout: "/admin",
   },
   {
-    path: "/table",
-    name: "Table List",
+    path: "/lessonManage",
+    name: "Lesson Manage",
     rtlName: "قائمة الجدول",
     icon: "content_paste",
-    component: TableList,
-    layout: "/admin"
+    component: LessonManage,
+    layout: "/admin",
   },
   {
-    path: "/typography",
-    name: "Typography",
+    path: "/seasonManage",
+    name: "Season Manage",
     rtlName: "طباعة",
     icon: LibraryBooks,
-    component: Typography,
-    layout: "/admin"
+    component: SeasonManage,
+    layout: "/admin",
   },
   {
-    path: "/icons",
-    name: "Icons",
+    path: "/TestExamManage",
+    name: "Test Exam Manage",
     rtlName: "الرموز",
     icon: BubbleChart,
-    component: Icons,
-    layout: "/admin"
+    component: TestExamManage,
+    layout: "/admin",
   },
   {
-    path: "/maps",
-    name: "Maps",
+    path: "/model3Dmanage",
+    name: "Model 3D Manage",
     rtlName: "خرائط",
     icon: LocationOn,
-    component: Maps,
-    layout: "/admin"
+    component: Model3DManage,
+    layout: "/admin",
   },
   {
     path: "/notifications",
@@ -91,7 +95,7 @@ const dashboardRoutes = [
     rtlName: "إخطارات",
     icon: Notifications,
     component: NotificationsPage,
-    layout: "/admin"
+    layout: "/admin",
   },
   {
     path: "/rtl-page",
@@ -99,7 +103,7 @@ const dashboardRoutes = [
     rtlName: "پشتیبانی از راست به چپ",
     icon: Language,
     component: RTLPage,
-    layout: "/rtl"
+    layout: "/rtl",
   },
   {
     path: "/upgrade-to-pro",
@@ -107,8 +111,8 @@ const dashboardRoutes = [
     rtlName: "التطور للاحترافية",
     icon: Unarchive,
     component: UpgradeToPro,
-    layout: "/admin"
-  }
+    layout: "/admin",
+  },
 ];
 
 export default dashboardRoutes;
