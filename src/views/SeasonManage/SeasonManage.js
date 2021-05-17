@@ -5,31 +5,13 @@ import { makeStyles } from "@material-ui/core/styles";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import {
-  Table,
-  Divider,
-  Tag,
-  Input,
-  Icon,
-  Modal,
-  Select,
-  Upload,
-  Form,
-  Button,
-} from "antd";
+import { Table, Input, Modal, Upload, Form, Button } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import "antd/dist/antd.css";
-import { Grid, Chip, Avatar, Fab } from "@material-ui/core";
-import {
-  Edit,
-  Delete,
-  Add,
-  CollectionsBookmarkOutlined,
-} from "@material-ui/icons";
-import lodash from "lodash";
+import { Avatar, Fab } from "@material-ui/core";
+import { Edit, Delete } from "@material-ui/icons";
 import {
   getAllSeason,
-  getSeason,
   postSeason,
   uploadMediaFile,
   putSeason,

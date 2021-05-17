@@ -34,6 +34,8 @@ import {
   uploadMediaFile,
   putLesson,
   deleteLesson,
+  deletePage,
+  getAllPage,
 } from "../../ultil/api";
 import Swal from "sweetalert2";
 import { apiUrl } from "../../ultil/apiUrl";
@@ -89,13 +91,22 @@ const useStyles = makeStyles(styles);
 
 export default function LessonManage() {
   const classes = useStyles();
+
+  // lesson
   const [dataLesson, setdataLesson] = useState(null);
   const [visibleEdit, setVisibleEdit] = useState(false);
+  const [lesson, setlesson] = useState(null);
+  const [form] = Form.useForm();
+
+  // video
   const [visibleVideo, setVisibleVideo] = useState(false);
   const [practiceVideo, setPracticeVideo] = useState(null);
   const [playVideo, setplayVideo] = useState(true);
-  const [lesson, setlesson] = useState(null);
-  const [form] = Form.useForm();
+
+  // page
+  const [page, setPage] = useState(null);
+  const [visiblePageEdit, setVisiblePageEdit] = useState(false);
+  const [dataPage, setdataPage] = useState(null);
 
   const reactPlayer = useRef(null);
 
@@ -104,10 +115,27 @@ export default function LessonManage() {
     console.log(res);
     setdataLesson(res.data);
   }
+
+  async function fetchDataPage(lesson_id) {
+    let res = await getAllPage(lesson_id);
+    console.log(res);
+    setdataPage(res.data);
+  }
+
   useEffect(() => {
     fetchDataLesson();
   }, []);
   const onChange = (pagination, filters, sorter, extra) => {
+    // console.log(extra.currentDataSource);
+    // this.setState({
+    //   selectedRowKeys: [],
+    //   loading: false,
+    //   current: Number(pagination.current),
+    //   pageSize: Number(pagination.pageSize),
+    // });
+  };
+
+  const onChangeTablePage = (pagination, filters, sorter, extra) => {
     // console.log(extra.currentDataSource);
     // this.setState({
     //   selectedRowKeys: [],
@@ -296,13 +324,110 @@ export default function LessonManage() {
               }).then(async (result) => {
                 if (result.isConfirmed) {
                   try {
-                    // await deleteLesson(lesson.id);
+                    await deleteLesson(lesson.id);
                     Swal.fire(
                       "Deleted!",
                       "Your file has been deleted.",
                       "success"
                     );
                     fetchDataLesson();
+                  } catch (e) {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Oops...",
+                      text: "Something went wrong, please try again!",
+                    });
+                  }
+                }
+              });
+            }}
+          >
+            <Delete />
+          </Fab>
+        </div>
+      ),
+    },
+  ];
+
+  const columnsPages = [
+    {
+      title: "Page order",
+      dataIndex: "page_order",
+      key: "page_order",
+      // ...this.getColumnSearchProps("name"),
+      width: 200,
+    },
+    {
+      title: "Thumbnail",
+      dataIndex: "image_background",
+      key: "thumbnail",
+      align: "center",
+      render: (img) => (
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Avatar
+            // onMouse
+            onClick={() => {
+              console.log(img);
+              Swal.fire({
+                imageUrl: `${apiUrl}${img?.url}`,
+                html: img && img?.url ? "" : "This season has no thumbnail!",
+                showConfirmButton: false,
+                showCloseButton: true,
+                customClass: {
+                  image: "storiesSwal",
+                },
+                width: 350,
+                padding: 0,
+              });
+            }}
+            src={`${apiUrl}${img?.url}`}
+          />
+        </div>
+      ),
+    },
+    {
+      title: "Action",
+      dataIndex: "id, page",
+      key: "action",
+      render: (id, page) => (
+        <div style={{ display: "flex" }}>
+          {/* {console.log('1,', season)} */}
+          <Fab
+            color="primary"
+            aria-label="add"
+            size="small"
+            onClick={() => {
+              console.log(page);
+              setPage(page);
+              setVisiblePageEdit(true);
+            }}
+            style={{ marginRight: "15px" }}
+          >
+            <Edit />
+          </Fab>
+          <Fab
+            color="secondary"
+            aria-label="delete"
+            size="small"
+            onClick={() => {
+              Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!",
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  try {
+                    await deletePage(page.id);
+                    Swal.fire(
+                      "Deleted!",
+                      "Your file has been deleted.",
+                      "success"
+                    );
+                    fetchDataPage();
                   } catch (e) {
                     Swal.fire({
                       icon: "error",
@@ -337,7 +462,7 @@ export default function LessonManage() {
         <Button type="success" onClick={showModalEdit}>
           Import Excel file
         </Button>
-        {dataLesson ? (
+        {dataLesson && (
           <Table
             // ref={this.tableRef}
             dataSource={dataLesson}
@@ -363,8 +488,6 @@ export default function LessonManage() {
             // rowSelection={rowSelection}
             rowKey="id"
           />
-        ) : (
-          ""
         )}
         <Modal
           title="Lesson"
@@ -374,74 +497,110 @@ export default function LessonManage() {
           onCancel={handleCancelEdit}
           width="800"
         >
-          <Form
-            name="validate_other"
-            {...formItemLayout}
-            onFinish={onFinish}
-            form={form}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-around",
+            }}
           >
-            {lesson != null && (
-              <Form.Item label="Old name: ">
-                {/* <span>{season.season_name}</span> */}
-              </Form.Item>
-            )}
-            {/* {lesson != null && (
-              <Form.Item label="Old thumbnail: ">
-                {lesson.season_img ? (
-                  <img
-                    style={{ margin: "0 auto" }}
-                    src={`${apiUrl}${season.season_img?.url}`}
-                    width="100px"
-                  />
-                ) : (
-                  "This season has no thumbnail!"
-                )}
-              </Form.Item>
-            )} */}
-            <Form.Item
-              name="lesson_name"
-              label={`${lesson != null ? "New name:" : "Lesson name"}`}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
+            <Form
+              name="validate_other"
+              {...formItemLayout}
+              onFinish={onFinish}
+              form={form}
             >
-              <Input />
-            </Form.Item>
-
-            {/* <Form.Item
-              name="season_img"
-              label={`${
-                season != null ? "New thumbnail:" : "Season thumbnail"
-              }`}
-              valuePropName="fileList"
-              getValueFromEvent={normFile}
-              extra="season thumbnail"
-            >
-              <Upload
-                id="thumbnail"
-                name="logo"
-                action="/upload.do"
-                listType="picture"
+              <Form.Item
+                name="lesson_name"
+                label="New name:"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
               >
-                <Button type="primary">
-                  <UploadOutlined />
-                  Click to upload season thumbnail
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="description"
+                label="New desciption:"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="model_type"
+                label="New model type name:"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="lesson_video"
+                label={`${lesson != null ? "New Video:" : "Lesson video"}`}
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                extra="lesson video"
+              >
+                <Upload
+                  id="video"
+                  name="logo"
+                  action="/upload.do"
+                  listType="video"
+                >
+                  <Button type="primary">
+                    <UploadOutlined />
+                    Click to upload lesson video
+                  </Button>
+                </Upload>
+              </Form.Item>
+              <Form.Item
+                wrapperCol={{
+                  span: 12,
+                  offset: 6,
+                }}
+              >
+                <Button type="info" htmlType="submit">
+                  Submit
                 </Button>
-              </Upload>
-            </Form.Item> */}
-            <Form.Item
-              wrapperCol={{
-                span: 12,
-                offset: 6,
-              }}
-            >
-              <Button type="info" htmlType="submit">
-                Submit
-              </Button>
-            </Form.Item>
-          </Form>
+              </Form.Item>
+            </Form>
+            {lesson && (
+              <Table
+                // ref={this.tableRef}
+                dataSource={lesson.pages}
+                style={{
+                  padding: "5px",
+                  borderRadius: "5px",
+                  backgroundColor: "white",
+                  // paddingBottom: `${this.state.levelHeight}px`,
+                  // paddingTop: dataAllStories.length > 0 ? '0px' : '0px',
+                  // clear: 'both',
+                }}
+                columns={columnsPages}
+                onChange={onChangeTablePage()}
+                pagination={{
+                  // pageSize: 5,
+                  pageSizeOptions: ["5", "10", "20"],
+                  showSizeChanger: true,
+                  locale: { items_per_page: "" },
+                  defaultPageSize: 5,
+                  // onShowSizeChange={this.onShowSizeChange}
+                }}
+                // locale={{ filterReset: '' }}
+                // rowSelection={rowSelection}
+                rowKey="id"
+              />
+            )}
+          </div>
         </Modal>
         <Modal
           title="Practice Video"

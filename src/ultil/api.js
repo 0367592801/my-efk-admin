@@ -79,3 +79,37 @@ export function putLesson(lesson_id, data) {
 export function deleteLesson(lesson_id) {
   return axios.delete(`${apiUrl}/lessons/${lesson_id}`);
 }
+
+//PAGE
+//get all pages
+export function getAllPage() {
+  return axios.get(`${apiUrl}/pages`);
+}
+
+//get pages
+export function getPage(id) {
+  return axios.get(`${apiUrl}/pages/${id}`);
+}
+
+//post pages
+export function postPage(data) {
+  return axios.post(`${apiUrl}/pages`, data, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+//put pages
+export function putPage(page_id, data) {
+  return axios.put(`${apiUrl}/pages/${page_id}`, data, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+//delete pages
+export function deletePage(page_id) {
+  return axios.delete(`${apiUrl}/pages/${page_id}`);
+}
