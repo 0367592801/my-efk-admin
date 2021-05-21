@@ -180,19 +180,19 @@ export default function LessonManage() {
         description: values.description,
         model_type: values.model_type,
       };
-      console.log(lesson);
+
       let res = lesson
         ? await putLesson(lesson.id, data)
         : await postLesson(data);
-      console.log(res);
+
       let lesson_id = res.data.id;
 
-      if (values.lesson_img)
+      if (values.lesson_video)
         await uploadMediaFile(
-          values.lesson_img[0],
+          values.lesson_video[0],
           "lesson",
           lesson_id,
-          "lesson_img"
+          "practice_video"
         );
 
       setTimeout(() => {

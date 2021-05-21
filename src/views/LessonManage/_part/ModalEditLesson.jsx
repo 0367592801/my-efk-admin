@@ -27,11 +27,14 @@ import {
   deleteLesson,
   deletePage,
   getAllPage,
+  postPage,
+  putPage,
 } from "../../../ultil/api";
 import "antd/dist/antd.css";
 import Swal from "sweetalert2";
 import { apiUrl } from "../../../ultil/apiUrl";
 import { UploadOutlined } from "@ant-design/icons";
+import ModalEditPage from "./ModalEditPage";
 
 const formItemLayout = {
   labelCol: {
@@ -43,16 +46,16 @@ const formItemLayout = {
 };
 
 export default function ModalEditLesson(props) {
-  console.log(props);
+  const [lesson, setlesson] = useState(null);
   // page
   const [page, setPage] = useState(null);
   const [visiblePageEdit, setVisiblePageEdit] = useState(false);
   const [dataPage, setdataPage] = useState(null);
+  const [formPage] = Form.useForm();
 
   async function fetchDataPage(lesson_id) {
-    let res = await getAllPage(lesson_id);
-    console.log(res);
-    setdataPage(res.data);
+    let res = await getLesson(lesson_id);
+    setlesson(res.data);
   }
 
   const columnsPages = [
@@ -73,7 +76,6 @@ export default function ModalEditLesson(props) {
           <Avatar
             // onMouse
             onClick={() => {
-              console.log(img);
               Swal.fire({
                 imageUrl: `${apiUrl}${img?.url}`,
                 html: img && img?.url ? "" : "This season has no thumbnail!",
@@ -97,13 +99,11 @@ export default function ModalEditLesson(props) {
       key: "action",
       render: (id, page) => (
         <div style={{ display: "flex" }}>
-          {/* {console.log('1,', season)} */}
           <Fab
             color="primary"
             aria-label="add"
             size="small"
             onClick={() => {
-              console.log(page);
               setPage(page);
               setVisiblePageEdit(true);
             }}
@@ -133,7 +133,7 @@ export default function ModalEditLesson(props) {
                       "Your file has been deleted.",
                       "success"
                     );
-                    fetchDataPage();
+                    fetchDataPage(props.lesson.id);
                   } catch (e) {
                     Swal.fire({
                       icon: "error",
@@ -160,6 +160,88 @@ export default function ModalEditLesson(props) {
     //   current: Number(pagination.current),
     //   pageSize: Number(pagination.pageSize),
     // });
+  };
+
+  const showModalPageEdit = () => {
+    setVisiblePageEdit(true);
+  };
+
+  const handleOkPageEdit = () => {
+    setTimeout(() => {
+      setVisiblePageEdit(false);
+    }, 1000);
+  };
+
+  const handleCancelPageEdit = () => {
+    console.log("Clicked cancel button");
+    setPage(null);
+    formPage.resetFields();
+    setVisiblePageEdit(false);
+  };
+
+  const normFilePage = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+
+    return e && e.fileList;
+  };
+
+  const onFinishPage = async (values) => {
+    try {
+      await Swal.fire({
+        title: "Data uploading",
+        html: "Please wait!",
+        timer: 1200,
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      let data = page
+        ? {
+            page_order: values.page_order,
+          }
+        : {
+            page_order: values.page_order,
+            lesson: props.lesson.id,
+          };
+
+      let res = page ? await putPage(page.id, data) : await postPage(data);
+
+      let page_id = res.data.id;
+
+      if (values.image_background)
+        await uploadMediaFile(
+          values.image_background[0],
+          "page",
+          page_id,
+          "image_background"
+        );
+
+      setTimeout(() => {
+        setVisiblePageEdit(false);
+      }, 1000);
+
+      fetchDataPage(props.lesson.id);
+
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Upload success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      formPage.resetFields();
+    } catch (e) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong, please try again!",
+      });
+      formPage.resetFields();
+    }
   };
 
   return (
@@ -242,10 +324,17 @@ export default function ModalEditLesson(props) {
             </Button>
           </Form.Item>
         </Form>
-        {props.lesson && (
+        <Button
+          style={{ width: "200px" }}
+          type="primary"
+          onClick={showModalPageEdit}
+        >
+          Create new page
+        </Button>
+        <React.Fragment>
           <Table
             // ref={this.tableRef}
-            dataSource={props.lesson.pages}
+            dataSource={lesson ? lesson?.pages : props.lesson?.pages}
             style={{
               padding: "5px",
               borderRadius: "5px",
@@ -268,7 +357,16 @@ export default function ModalEditLesson(props) {
             // rowSelection={rowSelection}
             rowKey="id"
           />
-        )}
+          <ModalEditPage
+            visiblePageEdit={visiblePageEdit}
+            handleOkPageEdit={handleOkPageEdit}
+            handleCancelPageEdit={handleCancelPageEdit}
+            onFinishPage={onFinishPage}
+            formPage={formPage}
+            page={page}
+            normFilePage={normFilePage}
+          />
+        </React.Fragment>
       </div>
     </Modal>
   );
